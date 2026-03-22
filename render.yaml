@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: exrplones-web
+    runtime: node
+    plan: free
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health

@@ -1,5 +1,9 @@
 _site/
 node_modules/
 assets/js/images/
+.env
+server/storage/content.json
+server/storage/uploads/*
+!server/storage/uploads/.gitkeep
 .DS_Store
 Thumbs.db

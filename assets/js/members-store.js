@@ -1,6 +1,7 @@
 const MEMBERS_STORAGE_KEY = "exrplones-members-data";
 const MEMBER_PLACEHOLDER_PHOTO = "assets/images/members/placeholder.svg";
 const localMediaStore = window.EXRPLONES_LOCAL_MEDIA;
+const apiClient = window.EXRPLONES_API;
 
 function slugifyMemberName(name) {
   const value = String(name || "")
@@ -76,6 +77,12 @@ async function fetchDefaultMembers(dataUrl) {
 }
 
 async function loadMembersCollection(dataUrl) {
+  if (apiClient && (await apiClient.hasBackend())) {
+    const apiMembers = await apiClient.getContent("members");
+    const normalizedMembers = Array.isArray(apiMembers) ? apiMembers.map(normalizeMember) : [];
+    return Promise.all(normalizedMembers.map(hydrateMemberMedia));
+  }
+
   const storedMembers = parseStoredMembers();
   if (storedMembers) {
     return Promise.all(storedMembers.map(hydrateMemberMedia));
@@ -85,13 +92,24 @@ async function loadMembersCollection(dataUrl) {
   return Promise.all(defaultMembers.map(hydrateMemberMedia));
 }
 
-function saveMembersCollection(members) {
+async function saveMembersCollection(members) {
   const normalized = Array.isArray(members) ? members.map(normalizeMember) : [];
+  if (apiClient && (await apiClient.hasBackend())) {
+    const saved = await apiClient.saveContent("members", normalized);
+    const normalizedSaved = Array.isArray(saved) ? saved.map(normalizeMember) : [];
+    return Promise.all(normalizedSaved.map(hydrateMemberMedia));
+  }
+
   window.localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(normalized));
   return normalized;
 }
 
-function clearMembersCollection() {
+async function clearMembersCollection() {
+  if (apiClient && (await apiClient.hasBackend())) {
+    await apiClient.resetContent("members");
+    return;
+  }
+
   window.localStorage.removeItem(MEMBERS_STORAGE_KEY);
 }
 

@@ -13,6 +13,7 @@ const ADMIN_DATA_PATHS = {
 const membersStore = window.EXRPLONES_MEMBERS_STORE;
 const contentStore = window.EXRPLONES_CONTENT_STORE;
 const localMediaStore = window.EXRPLONES_LOCAL_MEDIA;
+const apiClient = window.EXRPLONES_API;
 const adminMediaManagers = {
   memberPhoto: null,
   projectImage: null,
@@ -23,55 +24,78 @@ function getAdminPage() {
   return document.body.dataset.adminPage;
 }
 
-function isLoggedIn() {
+async function isLoggedIn() {
+  if (apiClient && (await apiClient.hasBackend())) {
+    try {
+      const session = await apiClient.getSession();
+      return Boolean(session?.authenticated);
+    } catch (error) {
+      return false;
+    }
+  }
+
   return window.localStorage.getItem(ADMIN_SESSION_KEY) === "active";
 }
 
-function requireAdminLogin() {
-  if (getAdminPage() !== "login" && !isLoggedIn()) {
+async function requireAdminLogin() {
+  if (getAdminPage() !== "login" && !(await isLoggedIn())) {
     window.location.href = "login.html";
   }
 }
 
 function initAdminLogout() {
   document.querySelectorAll("[data-admin-logout]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
+      if (apiClient && (await apiClient.hasBackend())) {
+        try {
+          await apiClient.logout();
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
       window.localStorage.removeItem(ADMIN_SESSION_KEY);
       window.location.href = "login.html";
     });
   });
 }
 
-function initAdminLogin() {
+async function initAdminLogin() {
   const form = document.querySelector("[data-admin-login]");
   if (!form) {
     return;
   }
 
-  if (isLoggedIn()) {
+  if (await isLoggedIn()) {
     window.location.href = "dashboard.html";
     return;
   }
 
   const errorNode = document.querySelector("[data-admin-error]");
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
     const username = String(formData.get("username") || "").trim();
     const password = String(formData.get("password") || "").trim();
 
-    if (
-      username === ADMIN_CREDENTIALS.username &&
-      password === ADMIN_CREDENTIALS.password
-    ) {
-      window.localStorage.setItem(ADMIN_SESSION_KEY, "active");
-      window.location.href = "dashboard.html";
-      return;
-    }
+    try {
+      if (apiClient && (await apiClient.hasBackend())) {
+        await apiClient.login(username, password);
+      } else if (
+        username === ADMIN_CREDENTIALS.username &&
+        password === ADMIN_CREDENTIALS.password
+      ) {
+        window.localStorage.setItem(ADMIN_SESSION_KEY, "active");
+      } else {
+        throw new Error("Username atau password belum sesuai.");
+      }
 
-    if (errorNode) {
-      errorNode.hidden = false;
-      errorNode.textContent = "Username atau password belum sesuai.";
+      window.location.href = "dashboard.html";
+    } catch (error) {
+      if (errorNode) {
+        errorNode.hidden = false;
+        errorNode.textContent = error.message || "Username atau password belum sesuai.";
+      }
     }
   });
 }
@@ -276,15 +300,23 @@ function createMediaPicker(form, options) {
     }
 
     try {
-      const storedSource = localMediaStore
-        ? await localMediaStore.saveFile(file, { scope: options.scope })
-        : "";
+      const storedSource = apiClient && (await apiClient.hasBackend())
+        ? (await apiClient.uploadMedia(file, options.scope)).url
+        : localMediaStore
+          ? await localMediaStore.saveFile(file, { scope: options.scope })
+          : "";
       sourceField.value = storedSource;
       if (labelField) {
         labelField.value = file.name || "";
       }
       await syncAll(storedSource);
-      setUploadStatus(statusNode, `${file.name} siap dipakai dari browser ini.`, "success");
+      setUploadStatus(
+        statusNode,
+        apiClient && (await apiClient.hasBackend())
+          ? `${file.name} berhasil diupload ke media publik.`
+          : `${file.name} siap dipakai dari browser ini.`,
+        "success",
+      );
     } catch (error) {
       setUploadStatus(statusNode, "File belum bisa diproses. Coba pilih ulang.", "error");
     }
@@ -533,7 +565,7 @@ async function setupCollectionAdminPage(config) {
       ];
     }
 
-    items = config.save(items);
+    items = await config.save(items);
     await switchToAddMode();
     render();
   });
@@ -573,7 +605,7 @@ async function setupCollectionAdminPage(config) {
 
       items = items.filter((entry) => entry.id !== itemId);
       await cleanupMediaFields(item, config.mediaFields);
-      items = config.save(items);
+      items = await config.save(items);
       if (getFormItemId(form) === itemId) {
         await switchToAddMode();
       }
@@ -840,14 +872,14 @@ async function loadAdminAbout() {
       return;
     }
 
-    contentStore.clearAbout();
+    await contentStore.clearAbout();
     await loadCurrent();
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
-    contentStore.saveAbout({
+    await contentStore.saveAbout({
       eyebrow: String(formData.get("eyebrow") || "").trim(),
       title: String(formData.get("title") || "").trim(),
       lead: String(formData.get("lead") || "").trim(),
@@ -862,8 +894,8 @@ async function loadAdminAbout() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  requireAdminLogin();
-  initAdminLogin();
+  await requireAdminLogin();
+  await initAdminLogin();
   initAdminLogout();
   initAdminMediaManagers();
 

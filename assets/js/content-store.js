@@ -5,6 +5,7 @@ const CONTENT_STORAGE_KEYS = {
   about: "exrplones-about-data",
 };
 const localMediaStore = window.EXRPLONES_LOCAL_MEDIA;
+const apiClient = window.EXRPLONES_API;
 
 function normalizeText(value) {
   return String(value || "").trim();
@@ -152,6 +153,11 @@ async function fetchSingleDefault(url, normalizer) {
 }
 
 async function loadCollectionContent(kind, url, normalizer) {
+  if (apiClient && (await apiClient.hasBackend())) {
+    const apiItems = await apiClient.getContent(kind);
+    return Array.isArray(apiItems) ? apiItems.map(normalizer) : [];
+  }
+
   const stored = parseStoredContent(CONTENT_STORAGE_KEYS[kind], normalizer, true);
   if (stored) {
     return stored;
@@ -166,6 +172,11 @@ async function loadHydratedCollectionContent(kind, url, normalizer, hydrator) {
 }
 
 async function loadSingleContent(kind, url, normalizer) {
+  if (apiClient && (await apiClient.hasBackend())) {
+    const apiItem = await apiClient.getContent(kind);
+    return normalizer(apiItem || {});
+  }
+
   const stored = parseStoredContent(CONTENT_STORAGE_KEYS[kind], normalizer, false);
   if (stored) {
     return stored;
@@ -174,19 +185,34 @@ async function loadSingleContent(kind, url, normalizer) {
   return fetchSingleDefault(url, normalizer);
 }
 
-function saveCollectionContent(kind, items, normalizer) {
+async function saveCollectionContent(kind, items, normalizer) {
   const normalized = Array.isArray(items) ? items.map(normalizer) : [];
+  if (apiClient && (await apiClient.hasBackend())) {
+    const saved = await apiClient.saveContent(kind, normalized);
+    return Array.isArray(saved) ? saved.map(normalizer) : [];
+  }
+
   window.localStorage.setItem(CONTENT_STORAGE_KEYS[kind], JSON.stringify(normalized));
   return normalized;
 }
 
-function saveSingleContent(kind, item, normalizer) {
+async function saveSingleContent(kind, item, normalizer) {
   const normalized = normalizer(item || {});
+  if (apiClient && (await apiClient.hasBackend())) {
+    const saved = await apiClient.saveContent(kind, normalized);
+    return normalizer(saved || {});
+  }
+
   window.localStorage.setItem(CONTENT_STORAGE_KEYS[kind], JSON.stringify(normalized));
   return normalized;
 }
 
-function clearContent(kind) {
+async function clearContent(kind) {
+  if (apiClient && (await apiClient.hasBackend())) {
+    await apiClient.resetContent(kind);
+    return;
+  }
+
   window.localStorage.removeItem(CONTENT_STORAGE_KEYS[kind]);
 }
 
