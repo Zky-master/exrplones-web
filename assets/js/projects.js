@@ -13,7 +13,7 @@ function attachProjectFallback(image) {
 }
 
 function renderProjectCard(project) {
-  const image = project.image || PROJECT_FALLBACK_IMAGE;
+  const image = project.image_url || project.image || PROJECT_FALLBACK_IMAGE;
   const techStack = Array.isArray(project.tech) ? project.tech : [];
   return `
     <article class="project-card card-surface" data-reveal>
@@ -38,7 +38,7 @@ function renderProjectCard(project) {
 }
 
 function renderProjectDetail(project, relatedProjects) {
-  const image = project.image || PROJECT_FALLBACK_IMAGE;
+  const image = project.image_url || project.image || PROJECT_FALLBACK_IMAGE;
   const techStack = Array.isArray(project.tech) ? project.tech : [];
   const features = Array.isArray(project.features) ? project.features : [];
 

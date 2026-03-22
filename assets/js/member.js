@@ -13,7 +13,7 @@ function attachFallbackImage(image) {
 }
 
 function renderMemberDetail(member, relatedMembers) {
-  const photo = member.photo || MEMBER_FALLBACK_PHOTO;
+  const photo = member.photo_url || member.photo || MEMBER_FALLBACK_PHOTO;
   const instagramMarkup = member.instagram
     ? `
       <a
@@ -34,7 +34,7 @@ function renderMemberDetail(member, relatedMembers) {
         <a class="related-card card-surface pressable" href="member.html?id=${item.id}">
           <img
             class="related-card__thumb"
-            src="${item.photo || MEMBER_FALLBACK_PHOTO}"
+            src="${item.photo_url || item.photo || MEMBER_FALLBACK_PHOTO}"
             alt="${item.name}"
             loading="lazy"
           />
@@ -176,7 +176,7 @@ async function loadMemberDetailPage() {
     const photoButton = container.querySelector("[data-detail-photo]");
     photoButton?.addEventListener("click", () => {
       window.EXRPLONES_MODAL?.openImageModal({
-        src: member.photo || MEMBER_FALLBACK_PHOTO,
+        src: member.photo_url || member.photo || MEMBER_FALLBACK_PHOTO,
         alt: member.name,
         caption: `${member.name} - ${member.role}`,
       });

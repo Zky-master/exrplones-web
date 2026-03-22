@@ -12,6 +12,7 @@
     />
     <link rel="stylesheet" href="../assets/css/style.css" />
     <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/local-media-store.js"></script>
     <script defer src="../assets/js/members-store.js"></script>
     <script defer src="../assets/js/content-store.js"></script>
     <script defer src="../assets/js/admin.js"></script>
@@ -80,12 +81,33 @@
                 <span>Lokasi</span>
                 <input type="text" name="location" placeholder="opsional" />
               </label>
+              <div class="admin-form__field admin-form__field--full">
+                <span>Upload Foto Profil</span>
+                <div class="admin-upload" data-admin-member-photo-picker>
+                  <div class="admin-upload__preview" data-admin-member-photo-preview></div>
+                  <div class="admin-upload__meta">
+                    <label class="button button--ghost pressable admin-upload__button">
+                      <input
+                        type="file"
+                        name="photo_file"
+                        accept="image/*"
+                        hidden
+                        data-admin-member-photo-file
+                      />
+                      Pilih Foto
+                    </label>
+                    <p class="admin-upload__status" data-admin-member-photo-status>
+                      Belum ada foto yang dipilih.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <label class="admin-form__field admin-form__field--full">
-                <span>Foto</span>
+                <span>Path / URL Foto</span>
                 <input
                   type="text"
                   name="photo"
-                  placeholder="assets/images/members/placeholder.svg"
+                  placeholder="assets/images/members/placeholder.svg atau media://..."
                 />
               </label>
               <label class="admin-form__field admin-form__field--full">

@@ -12,6 +12,7 @@
     />
     <link rel="stylesheet" href="../assets/css/style.css" />
     <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/local-media-store.js"></script>
     <script defer src="../assets/js/members-store.js"></script>
     <script defer src="../assets/js/content-store.js"></script>
     <script defer src="../assets/js/admin.js"></script>
@@ -75,9 +76,34 @@
                 <span>Tahun</span>
                 <input type="text" name="year" placeholder="2026" />
               </label>
+              <div class="admin-form__field admin-form__field--full">
+                <span>Upload Gambar Project</span>
+                <div class="admin-upload" data-admin-project-image-picker>
+                  <div class="admin-upload__preview" data-admin-project-image-preview></div>
+                  <div class="admin-upload__meta">
+                    <label class="button button--ghost pressable admin-upload__button">
+                      <input
+                        type="file"
+                        name="image_file"
+                        accept="image/*"
+                        hidden
+                        data-admin-project-image-file
+                      />
+                      Pilih Gambar
+                    </label>
+                    <p class="admin-upload__status" data-admin-project-image-status>
+                      Belum ada gambar yang dipilih.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <label class="admin-form__field admin-form__field--full">
-                <span>Path gambar</span>
-                <input type="text" name="image" placeholder="assets/images/projects/..." />
+                <span>Path / URL Gambar</span>
+                <input
+                  type="text"
+                  name="image"
+                  placeholder="assets/images/projects/... atau media://..."
+                />
               </label>
               <label class="admin-form__field admin-form__field--full">
                 <span>Deskripsi singkat</span>

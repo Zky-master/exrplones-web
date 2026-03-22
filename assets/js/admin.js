@@ -12,6 +12,12 @@ const ADMIN_DATA_PATHS = {
 };
 const membersStore = window.EXRPLONES_MEMBERS_STORE;
 const contentStore = window.EXRPLONES_CONTENT_STORE;
+const localMediaStore = window.EXRPLONES_LOCAL_MEDIA;
+const adminMediaManagers = {
+  memberPhoto: null,
+  projectImage: null,
+  gallerySource: null,
+};
 
 function getAdminPage() {
   return document.body.dataset.adminPage;
@@ -90,6 +96,235 @@ function parseListField(value) {
     .filter(Boolean);
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function getSourceBasename(source) {
+  const value = String(source || "").trim();
+  if (!value) {
+    return "";
+  }
+
+  const normalized = value.replace(/\\/g, "/");
+  const segments = normalized.split("/");
+  return segments[segments.length - 1];
+}
+
+function guessMediaKind(source, fallback = "image") {
+  const value = String(source || "").trim().toLowerCase();
+  if (!value) {
+    return fallback;
+  }
+
+  if (value.startsWith("data:video/")) {
+    return "video";
+  }
+
+  if (value.startsWith("data:image/")) {
+    return "image";
+  }
+
+  if (/\.(mp4|webm|ogg|mov|m4v)(?:$|[?#])/.test(value)) {
+    return "video";
+  }
+
+  return "image";
+}
+
+function setUploadStatus(node, text, tone = "") {
+  if (!node) {
+    return;
+  }
+
+  node.textContent = text;
+  if (tone) {
+    node.dataset.tone = tone;
+  } else {
+    delete node.dataset.tone;
+  }
+}
+
+function renderUploadPlaceholder(node, title, description) {
+  if (!node) {
+    return;
+  }
+
+  node.innerHTML = `
+    <div class="admin-upload__placeholder">
+      <strong>${escapeHtml(title)}</strong>
+      <span>${escapeHtml(description)}</span>
+    </div>
+  `;
+}
+
+function renderUploadPreview(node, source, kind, label) {
+  if (!node) {
+    return;
+  }
+
+  if (!source) {
+    renderUploadPlaceholder(
+      node,
+      kind === "video" ? "Belum ada video" : "Belum ada gambar",
+      "Pilih file dari perangkat atau isi path media secara manual.",
+    );
+    return;
+  }
+
+  if (kind === "video") {
+    node.innerHTML = `
+      <video controls playsinline preload="metadata">
+        <source src="${escapeHtml(source)}" />
+      </video>
+    `;
+    return;
+  }
+
+  node.innerHTML = `
+    <img src="${escapeHtml(source)}" alt="${escapeHtml(label || "Preview media")}" />
+  `;
+}
+
+function cleanupSourceLabel(field, source) {
+  if (field && !field.value.trim()) {
+    field.value = getSourceBasename(source);
+  }
+}
+
+function createMediaPicker(form, options) {
+  if (!form) {
+    return null;
+  }
+
+  const sourceField = form.elements[options.sourceField];
+  const fileField = form.elements[options.fileField];
+  const labelField = options.labelField ? form.elements[options.labelField] : null;
+  const typeField = options.typeField ? form.elements[options.typeField] : null;
+  const previewNode = form.querySelector(options.previewSelector);
+  const statusNode = form.querySelector(options.statusSelector);
+
+  if (!sourceField || !fileField || !previewNode) {
+    return null;
+  }
+
+  const currentKind = () => {
+    if (typeField) {
+      return String(typeField.value || "").toLowerCase() === "video" ? "video" : "image";
+    }
+
+    return options.defaultKind || "image";
+  };
+
+  const syncPreview = async (source = sourceField.value) => {
+    const resolvedSource = localMediaStore
+      ? await localMediaStore.resolveSource(source)
+      : String(source || "").trim();
+    renderUploadPreview(
+      previewNode,
+      resolvedSource || "",
+      guessMediaKind(resolvedSource || source, currentKind()),
+      labelField?.value || getSourceBasename(source),
+    );
+  };
+
+  const syncStatus = (source = sourceField.value) => {
+    const value = String(source || "").trim();
+    if (!value) {
+      setUploadStatus(statusNode, options.emptyMessage, "");
+      return;
+    }
+
+    if (localMediaStore?.isLocalMediaRef(value)) {
+      setUploadStatus(statusNode, "File tersimpan lokal di browser ini.", "success");
+      return;
+    }
+
+    if (value.startsWith("data:")) {
+      setUploadStatus(statusNode, "File tersimpan sebagai data lokal.", "success");
+      return;
+    }
+
+    setUploadStatus(statusNode, "Media memakai path atau URL manual.", "");
+  };
+
+  const syncAll = async (source = sourceField.value, preserveLabel = true) => {
+    const value = String(source || "").trim();
+    if (!preserveLabel && labelField) {
+      labelField.value = "";
+    }
+    cleanupSourceLabel(labelField, value);
+    await syncPreview(value);
+    syncStatus(value);
+  };
+
+  fileField.addEventListener("change", async () => {
+    const file = fileField.files?.[0];
+    if (!file) {
+      await syncAll(sourceField.value);
+      return;
+    }
+
+    const pickedKind = file.type.startsWith("video/") ? "video" : "image";
+    if (typeField) {
+      typeField.value = pickedKind === "video" ? "video" : "photo";
+    }
+
+    try {
+      const storedSource = localMediaStore
+        ? await localMediaStore.saveFile(file, { scope: options.scope })
+        : "";
+      sourceField.value = storedSource;
+      if (labelField) {
+        labelField.value = file.name || "";
+      }
+      await syncAll(storedSource);
+      setUploadStatus(statusNode, `${file.name} siap dipakai dari browser ini.`, "success");
+    } catch (error) {
+      setUploadStatus(statusNode, "File belum bisa diproses. Coba pilih ulang.", "error");
+    }
+  });
+
+  sourceField.addEventListener("input", async () => {
+    if (labelField && !fileField.files?.length) {
+      labelField.value = getSourceBasename(sourceField.value);
+    }
+    await syncAll(sourceField.value);
+  });
+
+  typeField?.addEventListener("change", async () => {
+    await syncAll(sourceField.value);
+  });
+
+  return {
+    async reset(defaultSource = "") {
+      if (fileField) {
+        fileField.value = "";
+      }
+      sourceField.value = defaultSource;
+      if (labelField) {
+        labelField.value = getSourceBasename(defaultSource);
+      }
+      await syncAll(defaultSource);
+    },
+    async fill(source, label = "") {
+      if (fileField) {
+        fileField.value = "";
+      }
+      sourceField.value = source || "";
+      if (labelField) {
+        labelField.value = label || getSourceBasename(source);
+      }
+      await syncAll(source || "");
+    },
+  };
+}
+
 function getFormIdField(form) {
   return form?.elements?.item_id || form?.elements?.member_id || null;
 }
@@ -129,6 +364,63 @@ function resetCollectionForm(form, defaults, submitLabelSelector, addLabel) {
   if (submitLabelSelector && addLabel) {
     setSubmitLabel(submitLabelSelector, addLabel);
   }
+}
+
+function initAdminMediaManagers() {
+  const memberForm = document.querySelector("[data-admin-member-form]");
+  if (memberForm) {
+    adminMediaManagers.memberPhoto = createMediaPicker(memberForm, {
+      sourceField: "photo",
+      fileField: "photo_file",
+      previewSelector: "[data-admin-member-photo-preview]",
+      statusSelector: "[data-admin-member-photo-status]",
+      scope: "members",
+      defaultKind: "image",
+      emptyMessage: "Belum ada foto yang dipilih.",
+    });
+  }
+
+  const projectForm = document.querySelector("[data-admin-project-form]");
+  if (projectForm) {
+    adminMediaManagers.projectImage = createMediaPicker(projectForm, {
+      sourceField: "image",
+      fileField: "image_file",
+      previewSelector: "[data-admin-project-image-preview]",
+      statusSelector: "[data-admin-project-image-status]",
+      scope: "projects",
+      defaultKind: "image",
+      emptyMessage: "Belum ada gambar yang dipilih.",
+    });
+  }
+
+  const galleryForm = document.querySelector("[data-admin-gallery-form]");
+  if (galleryForm) {
+    adminMediaManagers.gallerySource = createMediaPicker(galleryForm, {
+      sourceField: "source",
+      fileField: "source_file",
+      labelField: "filename",
+      typeField: "type",
+      previewSelector: "[data-admin-gallery-preview]",
+      statusSelector: "[data-admin-gallery-status]",
+      scope: "gallery",
+      defaultKind: "image",
+      emptyMessage: "Belum ada foto atau video yang dipilih.",
+    });
+  }
+}
+
+async function cleanupMediaFields(item, fields = []) {
+  if (!item || !Array.isArray(fields) || !fields.length || !localMediaStore) {
+    return;
+  }
+
+  await Promise.all(
+    fields
+      .map((field) => String(item[field] || "").trim())
+      .filter(Boolean)
+      .filter((source) => localMediaStore.isLocalMediaRef(source))
+      .map((source) => localMediaStore.deleteSource(source)),
+  );
 }
 
 function renderActionButtons(id) {
@@ -185,11 +477,12 @@ async function setupCollectionAdminPage(config) {
     }
   };
 
-  const switchToAddMode = () => {
+  const switchToAddMode = async () => {
     resetCollectionForm(form, config.defaults, config.submitLabelSelector, config.addLabel);
+    await config.onResetForm?.(form);
   };
 
-  switchToAddMode();
+  await switchToAddMode();
   render();
 
   searchInput?.addEventListener("input", render);
@@ -206,18 +499,27 @@ async function setupCollectionAdminPage(config) {
 
     await config.clear();
     items = await config.load();
-    switchToAddMode();
+    await switchToAddMode();
     render();
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const payload = config.readForm(form);
+    const payload = await config.readForm(form);
     if (!config.isValid(payload)) {
       return;
     }
 
     if (payload.id) {
+      const previousItem = items.find((item) => item.id === payload.id);
+      if (previousItem) {
+        await cleanupMediaFields(
+          Object.fromEntries(
+            (config.mediaFields || []).map((field) => [field, previousItem[field] !== payload[field] ? previousItem[field] : ""]),
+          ),
+          config.mediaFields,
+        );
+      }
       items = items.map((item) => {
         return item.id === payload.id ? { ...item, ...payload } : item;
       });
@@ -232,11 +534,11 @@ async function setupCollectionAdminPage(config) {
     }
 
     items = config.save(items);
-    switchToAddMode();
+    await switchToAddMode();
     render();
   });
 
-  table.addEventListener("click", (event) => {
+  table.addEventListener("click", async (event) => {
     const editButton = event.target.closest("[data-admin-edit]");
     const deleteButton = event.target.closest("[data-admin-delete]");
 
@@ -247,7 +549,7 @@ async function setupCollectionAdminPage(config) {
         return;
       }
 
-      config.fillForm(form, item);
+      await config.fillForm(form, item);
       if (config.submitLabelSelector) {
         setSubmitLabel(config.submitLabelSelector, config.editLabel);
       }
@@ -270,9 +572,10 @@ async function setupCollectionAdminPage(config) {
       }
 
       items = items.filter((entry) => entry.id !== itemId);
+      await cleanupMediaFields(item, config.mediaFields);
       items = config.save(items);
       if (getFormItemId(form) === itemId) {
-        switchToAddMode();
+        await switchToAddMode();
       }
       render();
     }
@@ -348,7 +651,7 @@ function readMemberForm(form) {
   };
 }
 
-function fillMemberForm(form, member) {
+async function fillMemberForm(form, member) {
   setFormItemId(form, member.id);
   form.elements.name.value = member.name || "";
   form.elements.username.value = member.username || "";
@@ -358,6 +661,9 @@ function fillMemberForm(form, member) {
   form.elements.photo.value = member.photo || membersStore.MEMBER_PLACEHOLDER_PHOTO;
   form.elements.headline.value = member.headline || "";
   form.elements.bio.value = member.bio || "";
+  await adminMediaManagers.memberPhoto?.fill(
+    member.photo || membersStore.MEMBER_PLACEHOLDER_PHOTO,
+  );
 }
 
 function renderProjectRows(projects) {
@@ -393,7 +699,7 @@ function readProjectForm(form) {
   };
 }
 
-function fillProjectForm(form, project) {
+async function fillProjectForm(form, project) {
   setFormItemId(form, project.id);
   form.elements.title.value = project.title || "";
   form.elements.category.value = project.category || "";
@@ -407,6 +713,7 @@ function fillProjectForm(form, project) {
   form.elements.features.value = Array.isArray(project.features)
     ? project.features.join(", ")
     : "";
+  await adminMediaManagers.projectImage?.fill(project.image || "");
 }
 
 function renderGalleryRows(items) {
@@ -429,7 +736,10 @@ function readGalleryForm(form) {
   const formData = new FormData(form);
   const source = String(formData.get("source") || "").trim();
   const title = String(formData.get("title") || "").trim();
-  const filename = source ? source.split("/").pop() : title;
+  const filename =
+    String(formData.get("filename") || "").trim() ||
+    getSourceBasename(source) ||
+    title;
 
   return {
     id: getSubmittedItemId(formData),
@@ -441,12 +751,14 @@ function readGalleryForm(form) {
   };
 }
 
-function fillGalleryForm(form, item) {
+async function fillGalleryForm(form, item) {
   setFormItemId(form, item.id);
   form.elements.title.value = item.title || "";
   form.elements.type.value = item.type || "photo";
   form.elements.source.value = item.source || "";
   form.elements.date.value = item.date || "";
+  form.elements.filename.value = item.filename || "";
+  await adminMediaManagers.gallerySource?.fill(item.source || "", item.filename || "");
 }
 
 function renderEventRows(events) {
@@ -553,6 +865,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   requireAdminLogin();
   initAdminLogin();
   initAdminLogout();
+  initAdminMediaManagers();
 
   try {
     await Promise.all([
@@ -575,6 +888,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           role: "Anggota",
           photo: membersStore.MEMBER_PLACEHOLDER_PHOTO,
         },
+        mediaFields: ["photo"],
         countLabel: "anggota",
         emptyColspan: 5,
         emptyText: "Belum ada anggota yang cocok.",
@@ -582,6 +896,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderRows: renderMemberRows,
         readForm: readMemberForm,
         fillForm: fillMemberForm,
+        onResetForm: async () =>
+          adminMediaManagers.memberPhoto?.reset(membersStore.MEMBER_PLACEHOLDER_PHOTO),
         isValid: (item) => Boolean(item.name),
         searchText: (item) =>
           `${item.name} ${item.username} ${item.instagram} ${item.role}`.toLowerCase(),
@@ -602,7 +918,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         submitLabelSelector: "[data-admin-project-submit-label]",
         addLabel: "Tambah Project",
         editLabel: "Simpan Perubahan",
-        defaults: {},
+        defaults: {
+          image: "assets/images/projects/placeholder.svg",
+        },
+        mediaFields: ["image"],
         countLabel: "project",
         emptyColspan: 5,
         emptyText: "Belum ada project yang cocok.",
@@ -610,6 +929,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderRows: renderProjectRows,
         readForm: readProjectForm,
         fillForm: fillProjectForm,
+        onResetForm: async () =>
+          adminMediaManagers.projectImage?.reset("assets/images/projects/placeholder.svg"),
         isValid: (item) => Boolean(item.title),
         searchText: (item) =>
           `${item.title} ${item.category} ${item.status}`.toLowerCase(),
@@ -631,6 +952,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         addLabel: "Tambah Media",
         editLabel: "Simpan Perubahan",
         defaults: { type: "photo" },
+        mediaFields: ["source"],
         countLabel: "media",
         emptyColspan: 5,
         emptyText: "Belum ada media yang cocok.",
@@ -638,6 +960,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderRows: renderGalleryRows,
         readForm: readGalleryForm,
         fillForm: fillGalleryForm,
+        onResetForm: async (form) => {
+          form.elements.filename.value = "";
+          await adminMediaManagers.gallerySource?.reset("");
+        },
         isValid: (item) => Boolean(item.title && item.source),
         searchText: (item) =>
           `${item.title} ${item.filename} ${item.source} ${item.type}`.toLowerCase(),

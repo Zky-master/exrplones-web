@@ -1,5 +1,6 @@
 const MEMBERS_STORAGE_KEY = "exrplones-members-data";
 const MEMBER_PLACEHOLDER_PHOTO = "assets/images/members/placeholder.svg";
+const localMediaStore = window.EXRPLONES_LOCAL_MEDIA;
 
 function slugifyMemberName(name) {
   const value = String(name || "")
@@ -34,6 +35,18 @@ function normalizeMember(member, index) {
   };
 }
 
+async function hydrateMemberMedia(member) {
+  const photo = String(member?.photo || "").trim();
+  const resolvedPhoto = localMediaStore
+    ? await localMediaStore.resolveSource(photo)
+    : photo;
+
+  return {
+    ...member,
+    photo_url: resolvedPhoto || photo || MEMBER_PLACEHOLDER_PHOTO,
+  };
+}
+
 function parseStoredMembers() {
   try {
     const raw = window.localStorage.getItem(MEMBERS_STORAGE_KEY);
@@ -65,10 +78,11 @@ async function fetchDefaultMembers(dataUrl) {
 async function loadMembersCollection(dataUrl) {
   const storedMembers = parseStoredMembers();
   if (storedMembers) {
-    return storedMembers;
+    return Promise.all(storedMembers.map(hydrateMemberMedia));
   }
 
-  return fetchDefaultMembers(dataUrl);
+  const defaultMembers = await fetchDefaultMembers(dataUrl);
+  return Promise.all(defaultMembers.map(hydrateMemberMedia));
 }
 
 function saveMembersCollection(members) {

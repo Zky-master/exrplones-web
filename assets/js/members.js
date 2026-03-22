@@ -18,7 +18,7 @@ function handleFallbackImage(image) {
 }
 
 function renderMemberCard(member) {
-  const photo = member.photo || MEMBER_PLACEHOLDER;
+  const photo = member.photo_url || member.photo || MEMBER_PLACEHOLDER;
   const secondaryText = member.instagram
     ? `@${member.instagram}`
     : member.username

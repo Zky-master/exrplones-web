@@ -88,6 +88,83 @@
   color: #ff8d9b;
 }
 
+.admin-upload {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 22px;
+  border: 1px solid rgba(96, 205, 255, 0.16);
+  background:
+    linear-gradient(180deg, rgba(6, 22, 41, 0.78), rgba(5, 17, 31, 0.92)),
+    radial-gradient(circle at top right, rgba(69, 217, 255, 0.12), transparent 28%);
+}
+
+.admin-upload__preview {
+  min-height: 180px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px dashed rgba(96, 205, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(4, 15, 28, 0.88), rgba(5, 17, 31, 0.94)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(69, 217, 255, 0.05) 0 12px,
+      rgba(5, 17, 31, 0.02) 12px 24px
+    );
+  display: grid;
+  place-items: center;
+}
+
+.admin-upload__preview img,
+.admin-upload__preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-upload__preview video {
+  background: #020b14;
+}
+
+.admin-upload__placeholder {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.admin-upload__placeholder strong {
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.admin-upload__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-upload__button {
+  width: fit-content;
+}
+
+.admin-upload__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.admin-upload__status[data-tone="success"] {
+  color: var(--signal);
+}
+
+.admin-upload__status[data-tone="error"] {
+  color: #ff8d9b;
+}
+
 .admin-shell {
   width: min(1280px, calc(100vw - 2rem));
   margin: 1rem auto 2rem;
@@ -343,6 +420,15 @@
 
   .admin-form__actions .button,
   .admin-table__actions .button {
+    width: 100%;
+  }
+
+  .admin-upload__meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-upload__button {
     width: 100%;
   }
 }

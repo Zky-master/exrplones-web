@@ -12,6 +12,7 @@
     />
     <link rel="stylesheet" href="../assets/css/style.css" />
     <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/local-media-store.js"></script>
     <script defer src="../assets/js/members-store.js"></script>
     <script defer src="../assets/js/content-store.js"></script>
     <script defer src="../assets/js/admin.js"></script>
@@ -59,6 +60,7 @@
             </div>
             <form class="admin-form admin-form--members" data-admin-gallery-form>
               <input type="hidden" name="item_id" />
+              <input type="hidden" name="filename" />
               <label class="admin-form__field admin-form__field--full">
                 <span>Judul</span>
                 <input type="text" name="title" placeholder="Judul media" required />
@@ -74,9 +76,35 @@
                 <span>Tanggal</span>
                 <input type="date" name="date" />
               </label>
+              <div class="admin-form__field admin-form__field--full">
+                <span>Upload Media</span>
+                <div class="admin-upload" data-admin-gallery-picker>
+                  <div class="admin-upload__preview" data-admin-gallery-preview></div>
+                  <div class="admin-upload__meta">
+                    <label class="button button--ghost pressable admin-upload__button">
+                      <input
+                        type="file"
+                        name="source_file"
+                        accept="image/*,video/*"
+                        hidden
+                        data-admin-gallery-file
+                      />
+                      Pilih File
+                    </label>
+                    <p class="admin-upload__status" data-admin-gallery-status>
+                      Belum ada foto atau video yang dipilih.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <label class="admin-form__field admin-form__field--full">
-                <span>Path file</span>
-                <input type="text" name="source" placeholder="assets/images/gallery/... atau assets/videos/..." required />
+                <span>Path / URL Media</span>
+                <input
+                  type="text"
+                  name="source"
+                  placeholder="assets/images/gallery/... , assets/videos/... , atau media://..."
+                  required
+                />
               </label>
               <div class="admin-form__actions admin-form__field--full">
                 <button class="button button--solid pressable" type="submit" data-admin-gallery-submit-label>
@@ -90,7 +118,7 @@
                 </button>
               </div>
               <p class="admin-form__hint admin-form__field--full">
-                Gunakan path file yang sudah ada di folder `assets/images/gallery` atau `assets/videos`.
+                Bisa pakai file picker, path aset, atau URL. File picker disimpan di browser ini.
               </p>
             </form>
           </section>

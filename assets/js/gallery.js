@@ -36,7 +36,7 @@ function sortGalleryItems(items) {
 }
 
 function renderGalleryCard(item) {
-  const safeSource = item.source || GALLERY_PLACEHOLDER;
+  const safeSource = item.source_url || item.source || GALLERY_PLACEHOLDER;
   const meta = `
     <div class="media-card__meta">
       <span>${item.type === "video" ? "Video" : "Foto"}</span>

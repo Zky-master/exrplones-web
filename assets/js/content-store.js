@@ -4,6 +4,7 @@ const CONTENT_STORAGE_KEYS = {
   events: "exrplones-events-data",
   about: "exrplones-about-data",
 };
+const localMediaStore = window.EXRPLONES_LOCAL_MEDIA;
 
 function normalizeText(value) {
   return String(value || "").trim();
@@ -37,6 +38,18 @@ function normalizeProject(project, index) {
   };
 }
 
+async function hydrateProjectMedia(project) {
+  const image = normalizeText(project?.image);
+  const resolvedImage = localMediaStore
+    ? await localMediaStore.resolveSource(image)
+    : image;
+
+  return {
+    ...project,
+    image_url: resolvedImage || image || "assets/images/projects/placeholder.svg",
+  };
+}
+
 function deriveFilename(source, fallbackTitle) {
   const raw = normalizeText(source);
   if (raw) {
@@ -59,6 +72,18 @@ function normalizeGalleryItem(item, index) {
     type,
     source,
     date: normalizeText(item?.date),
+  };
+}
+
+async function hydrateGalleryMedia(item) {
+  const source = normalizeText(item?.source);
+  const resolvedSource = localMediaStore
+    ? await localMediaStore.resolveSource(source)
+    : source;
+
+  return {
+    ...item,
+    source_url: resolvedSource || source,
   };
 }
 
@@ -135,6 +160,11 @@ async function loadCollectionContent(kind, url, normalizer) {
   return fetchCollectionDefault(url, normalizer);
 }
 
+async function loadHydratedCollectionContent(kind, url, normalizer, hydrator) {
+  const items = await loadCollectionContent(kind, url, normalizer);
+  return hydrator ? Promise.all(items.map(hydrator)) : items;
+}
+
 async function loadSingleContent(kind, url, normalizer) {
   const stored = parseStoredContent(CONTENT_STORAGE_KEYS[kind], normalizer, false);
   if (stored) {
@@ -166,10 +196,12 @@ window.EXRPLONES_CONTENT_STORE = {
   normalizeGalleryItem,
   normalizeEventItem,
   normalizeAboutContent,
-  loadProjects: (url) => loadCollectionContent("projects", url, normalizeProject),
+  loadProjects: (url) =>
+    loadHydratedCollectionContent("projects", url, normalizeProject, hydrateProjectMedia),
   saveProjects: (items) => saveCollectionContent("projects", items, normalizeProject),
   clearProjects: () => clearContent("projects"),
-  loadGallery: (url) => loadCollectionContent("gallery", url, normalizeGalleryItem),
+  loadGallery: (url) =>
+    loadHydratedCollectionContent("gallery", url, normalizeGalleryItem, hydrateGalleryMedia),
   saveGallery: (items) => saveCollectionContent("gallery", items, normalizeGalleryItem),
   clearGallery: () => clearContent("gallery"),
   loadEvents: (url) => loadCollectionContent("events", url, normalizeEventItem),

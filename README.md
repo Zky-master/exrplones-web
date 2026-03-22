@@ -2,6 +2,8 @@
 
 Portal static untuk anggota, galeri, kegiatan, dan panel admin EXRPLONES.
 
+Live saat ini: `https://zky-master.github.io/exrplones-web/`
+
 ## Jalankan lokal
 
 Gunakan local server, jangan buka file HTML langsung.
@@ -45,6 +47,14 @@ git add .
 git commit -m "Prepare EXRPLONES for public deploy"
 git push -u origin main
 ```
+
+## Custom domain pendek
+
+Kalau ingin pakai domain pendek seperti `exrplones.com`, domain itu harus aktif dulu di penyedia domain/DNS.
+
+- Saat ini `exrplones.com` belum punya DNS aktif.
+- Setelah domain aktif, arahkan DNS ke GitHub Pages.
+- Baru setelah itu custom domain bisa dipasang di pengaturan Pages repository.
 
 ## Catatan penting admin
 
