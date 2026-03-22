@@ -41,9 +41,6 @@ const fallbackComponents = {
           <a class="pressable" href="https://instagram.com/exrplones" target="_blank" rel="noreferrer">
             @exrplones
           </a>
-          <span>Anggota</span>
-          <span>Galeri</span>
-          <span>Admin</span>
         </div>
       </div>
     </footer>
