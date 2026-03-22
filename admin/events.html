@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EXRPLONES Admin | Events</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/members-store.js"></script>
+    <script defer src="../assets/js/content-store.js"></script>
+    <script defer src="../assets/js/admin.js"></script>
+  </head>
+  <body data-admin-page="events">
+    <main class="admin-shell">
+      <aside class="admin-sidebar card-surface">
+        <div class="admin-sidebar__brand">
+          <p class="eyebrow">EXRPLONES</p>
+          <h2>Panel Admin</h2>
+          <p class="detail-note">Kelola agenda dan timeline kegiatan kelas.</p>
+          <span class="admin-sidebar__chip">Kegiatan aktif</span>
+        </div>
+        <nav class="admin-sidebar__nav">
+          <a class="pressable" href="dashboard.html">Dashboard</a>
+          <a class="pressable" href="members.html">Members</a>
+          <a class="pressable" href="projects.html">Projects</a>
+          <a class="pressable" href="gallery.html">Gallery</a>
+          <a class="pressable is-active" href="events.html">Events</a>
+          <a class="pressable" href="about.html">About</a>
+          <a class="pressable" href="../index.html">Website</a>
+        </nav>
+        <button class="button button--ghost pressable" type="button" data-admin-logout>
+          Logout
+        </button>
+      </aside>
+
+      <section class="admin-content">
+        <header class="admin-header">
+          <div>
+            <p class="eyebrow">Kegiatan</p>
+            <h1>Kelola agenda dan kegiatan kelas.</h1>
+          </div>
+          <label class="admin-search">
+            <span>Cari kegiatan</span>
+            <input type="search" placeholder="Judul, lokasi, status, atau waktu" data-admin-events-search />
+          </label>
+        </header>
+
+        <div class="admin-manage-layout">
+          <section class="card-surface admin-panel">
+            <div class="admin-panel__head">
+              <div>
+                <p class="eyebrow">Form Kegiatan</p>
+                <h2>Tambah atau edit kegiatan.</h2>
+              </div>
+            </div>
+            <form class="admin-form admin-form--members" data-admin-event-form>
+              <input type="hidden" name="item_id" />
+              <label class="admin-form__field admin-form__field--full">
+                <span>Judul kegiatan</span>
+                <input type="text" name="title" placeholder="Nama kegiatan" required />
+              </label>
+              <label class="admin-form__field">
+                <span>Tanggal</span>
+                <input type="date" name="date" />
+              </label>
+              <label class="admin-form__field">
+                <span>Waktu</span>
+                <input type="text" name="time" placeholder="08.00 WIB" />
+              </label>
+              <label class="admin-form__field">
+                <span>Lokasi</span>
+                <input type="text" name="location" placeholder="Lokasi kegiatan" />
+              </label>
+              <label class="admin-form__field">
+                <span>Status</span>
+                <input type="text" name="status" placeholder="Terjadwal, Berjalan, Selesai" />
+              </label>
+              <label class="admin-form__field admin-form__field--full">
+                <span>Deskripsi</span>
+                <textarea name="description" rows="4" placeholder="Deskripsi event"></textarea>
+              </label>
+              <div class="admin-form__actions admin-form__field--full">
+                <button class="button button--solid pressable" type="submit" data-admin-event-submit-label>
+                  Tambah Kegiatan
+                </button>
+                <button class="button button--ghost pressable" type="button" data-admin-event-form-reset>
+                  Reset Form
+                </button>
+                <button class="button button--ghost pressable" type="button" data-admin-event-reset-storage>
+                  Kembalikan Data Awal
+                </button>
+              </div>
+              <p class="admin-form__hint admin-form__field--full">
+                Kegiatan bisa diisi lengkap dengan tanggal, waktu, lokasi, dan status seperti panel admin lainnya.
+              </p>
+            </form>
+          </section>
+
+          <section class="card-surface admin-panel">
+            <div class="admin-panel__head">
+              <div>
+                <p class="eyebrow">Daftar Kegiatan</p>
+                <h2>Semua agenda aktif.</h2>
+              </div>
+              <strong data-admin-events-count>0 kegiatan</strong>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Kegiatan</th>
+                    <th>Jadwal</th>
+                    <th>Lokasi</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody data-admin-events-table></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

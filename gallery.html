@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EXRPLONES | Gallery</title>
+    <meta
+      name="description"
+      content="Halaman gallery EXRPLONES untuk foto dan video kegiatan."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/animation.css" />
+    <script defer src="assets/js/main.js"></script>
+    <script defer src="assets/js/content-store.js"></script>
+    <script defer src="assets/js/modal.js"></script>
+    <script defer src="assets/js/gallery.js"></script>
+  </head>
+  <body data-page="gallery">
+    <div data-component="navbar"></div>
+
+    <main class="page-main">
+      <section class="page-header container" data-reveal>
+        <p class="eyebrow">Gallery EXRPLONES</p>
+        <h1>Foto dan video kegiatan angkatan sudah masuk ke web.</h1>
+        <p class="page-header__lead">
+          Semua media diambil dari folder dokumentasi lalu dipasang ke gallery supaya gampang
+          dibuka dari satu tempat.
+        </p>
+        <div class="hero__actions">
+          <a
+            class="button button--solid pressable"
+            href="https://instagram.com/exrplones"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Instagram @exrplones
+          </a>
+        </div>
+      </section>
+
+      <section class="container" data-reveal>
+        <div class="stat-grid">
+          <article class="stat-card card-surface">
+            <strong data-gallery-total>0</strong>
+            <span>total media</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-gallery-photos>0</strong>
+            <span>foto</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-gallery-videos>0</strong>
+            <span>video</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="section container">
+        <div class="media-grid" data-gallery-grid aria-live="polite"></div>
+      </section>
+    </main>
+
+    <div data-component="footer"></div>
+  </body>
+</html>

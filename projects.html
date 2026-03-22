@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EXRPLONES | Projects</title>
+    <meta
+      name="description"
+      content="Daftar project EXRPLONES yang di-render dari projects.json."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/animation.css" />
+    <script defer src="assets/js/main.js"></script>
+    <script defer src="assets/js/content-store.js"></script>
+    <script defer src="assets/js/projects.js"></script>
+  </head>
+  <body data-page="projects">
+    <div data-component="navbar"></div>
+
+    <main class="page-main">
+      <section class="page-header container" data-reveal>
+        <p class="eyebrow">Project RPL</p>
+        <h1>Project EXRPLONES.</h1>
+        <p class="page-header__lead">
+          Daftar project ini bisa ditambah dan diubah dari panel admin.
+        </p>
+      </section>
+
+      <section class="section container">
+        <div class="projects-grid" data-projects-grid aria-live="polite"></div>
+      </section>
+    </main>
+
+    <div data-component="footer"></div>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EXRPLONES Admin | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/members-store.js"></script>
+    <script defer src="../assets/js/content-store.js"></script>
+    <script defer src="../assets/js/admin.js"></script>
+  </head>
+  <body data-admin-page="dashboard">
+    <main class="admin-shell">
+      <aside class="admin-sidebar card-surface">
+        <div class="admin-sidebar__brand">
+          <p class="eyebrow">EXRPLONES</p>
+          <h2>Panel Admin</h2>
+          <p class="detail-note">Pusat kontrol data kelas XI RPL 1.</p>
+          <span class="admin-sidebar__chip">Dashboard aktif</span>
+        </div>
+        <nav class="admin-sidebar__nav">
+          <a class="pressable is-active" href="dashboard.html">Dashboard</a>
+          <a class="pressable" href="members.html">Members</a>
+          <a class="pressable" href="projects.html">Projects</a>
+          <a class="pressable" href="gallery.html">Gallery</a>
+          <a class="pressable" href="events.html">Events</a>
+          <a class="pressable" href="about.html">About</a>
+          <a class="pressable" href="../index.html">Website</a>
+        </nav>
+        <button class="button button--ghost pressable" type="button" data-admin-logout>
+          Logout
+        </button>
+      </aside>
+
+      <section class="admin-content">
+        <header class="admin-header admin-header--hero card-surface">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h1>Kontrol pusat EXRPLONES.</h1>
+            <p class="page-header__lead">
+              Semua area penting sekarang bisa dipantau dari panel yang lebih gelap, neon, dan
+              sejalan dengan vibe beranda utama.
+            </p>
+          </div>
+          <div class="admin-header__badge">
+            <span>STATUS</span>
+            <strong>ADMIN ONLINE</strong>
+            <small>@exrplones</small>
+          </div>
+        </header>
+
+        <div class="admin-stats">
+          <article class="stat-card card-surface">
+            <strong data-admin-members-total>0</strong>
+            <span>anggota</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-admin-projects-total>0</strong>
+            <span>project</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-admin-photos-total>0</strong>
+            <span>foto</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-admin-videos-total>0</strong>
+            <span>video</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-admin-events-total>0</strong>
+            <span>event</span>
+          </article>
+          <article class="stat-card card-surface">
+            <strong data-admin-about-status>kosong</strong>
+            <span>about</span>
+          </article>
+        </div>
+
+        <section class="card-surface admin-panel">
+          <div class="admin-panel__head">
+            <div>
+              <p class="eyebrow">Akses Cepat</p>
+              <h2>Masuk ke area yang paling sering dikelola.</h2>
+            </div>
+          </div>
+          <div class="portal-grid">
+            <a class="portal-card card-surface pressable" href="members.html">
+              <span class="portal-card__tag">Data</span>
+              <h3>Kelola Members</h3>
+              <p>Tambah, edit, dan hapus anggota dari panel admin.</p>
+            </a>
+            <a class="portal-card card-surface pressable" href="projects.html">
+              <span class="portal-card__tag">Project</span>
+              <h3>Kelola Projects</h3>
+              <p>Tambah dan ubah daftar project yang tampil di halaman publik.</p>
+            </a>
+            <a class="portal-card card-surface pressable" href="gallery.html">
+              <span class="portal-card__tag">Media</span>
+              <h3>Kelola Gallery</h3>
+              <p>Atur foto dan video dengan path aset yang sudah ada di project.</p>
+            </a>
+            <a class="portal-card card-surface pressable" href="events.html">
+              <span class="portal-card__tag">Agenda</span>
+              <h3>Kelola Events</h3>
+              <p>Isi kegiatan dan timeline angkatan langsung dari panel admin.</p>
+            </a>
+            <a class="portal-card card-surface pressable" href="about.html">
+              <span class="portal-card__tag">Profil</span>
+              <h3>Kelola About</h3>
+              <p>Ubah isi halaman tentang angkatan tanpa edit HTML manual.</p>
+            </a>
+            <a
+              class="portal-card card-surface pressable"
+              href="https://instagram.com/exrplones"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="portal-card__tag">Sosial</span>
+              <h3>@exrplones</h3>
+              <p>Buka Instagram angkatan langsung dari panel admin.</p>
+            </a>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

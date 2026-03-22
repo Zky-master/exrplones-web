@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EXRPLONES Admin | About</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/members-store.js"></script>
+    <script defer src="../assets/js/content-store.js"></script>
+    <script defer src="../assets/js/admin.js"></script>
+  </head>
+  <body data-admin-page="about">
+    <main class="admin-shell">
+      <aside class="admin-sidebar card-surface">
+        <div>
+          <p class="eyebrow">EXRPLONES</p>
+          <h2>Panel Admin</h2>
+        </div>
+        <nav class="admin-sidebar__nav">
+          <a class="pressable" href="dashboard.html">Dashboard</a>
+          <a class="pressable" href="members.html">Members</a>
+          <a class="pressable" href="projects.html">Projects</a>
+          <a class="pressable" href="gallery.html">Gallery</a>
+          <a class="pressable" href="events.html">Events</a>
+          <a class="pressable is-active" href="about.html">About</a>
+          <a class="pressable" href="../index.html">Website</a>
+        </nav>
+        <button class="button button--ghost pressable" type="button" data-admin-logout>
+          Logout
+        </button>
+      </aside>
+
+      <section class="admin-content">
+        <header class="admin-header">
+          <div>
+            <p class="eyebrow">About</p>
+            <h1>Kelola isi halaman about.</h1>
+          </div>
+          <strong class="detail-note" data-admin-about-form-status>belum disimpan</strong>
+        </header>
+
+        <section class="card-surface admin-panel">
+          <div class="admin-panel__head">
+            <div>
+              <p class="eyebrow">Konten About</p>
+              <h2>Isi judul dan deskripsi angkatan.</h2>
+            </div>
+          </div>
+
+          <form class="admin-form admin-form--members" data-admin-about-form>
+            <label class="admin-form__field admin-form__field--full">
+              <span>Eyebrow</span>
+              <input type="text" name="eyebrow" placeholder="Tentang Angkatan" />
+            </label>
+            <label class="admin-form__field admin-form__field--full">
+              <span>Judul utama</span>
+              <input type="text" name="title" placeholder="Judul halaman about" />
+            </label>
+            <label class="admin-form__field admin-form__field--full">
+              <span>Lead</span>
+              <textarea name="lead" rows="3" placeholder="Paragraf pembuka halaman about"></textarea>
+            </label>
+            <label class="admin-form__field admin-form__field--full">
+              <span>Judul isi</span>
+              <input type="text" name="body_title" placeholder="Tentang EXRPLONES" />
+            </label>
+            <label class="admin-form__field admin-form__field--full">
+              <span>Isi utama</span>
+              <textarea name="body_text" rows="6" placeholder="Deskripsi lengkap angkatan"></textarea>
+            </label>
+            <div class="admin-form__actions admin-form__field--full">
+              <button class="button button--solid pressable" type="submit">Simpan About</button>
+              <button class="button button--ghost pressable" type="button" data-admin-about-form-reset>
+                Reset Form
+              </button>
+              <button class="button button--ghost pressable" type="button" data-admin-about-reset-storage>
+                Kembalikan Data Awal
+              </button>
+            </div>
+          </form>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

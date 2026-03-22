@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EXRPLONES Admin | Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script defer src="../assets/js/members-store.js"></script>
+    <script defer src="../assets/js/content-store.js"></script>
+    <script defer src="../assets/js/admin.js"></script>
+  </head>
+  <body data-admin-page="login">
+    <main class="admin-login">
+      <section class="admin-login__card card-surface">
+        <p class="eyebrow">Admin Panel</p>
+        <h1>Masuk ke panel admin EXRPLONES.</h1>
+        <p class="page-header__lead">
+          Panel ini dipakai untuk lihat ringkasan data dan daftar anggota dari satu tempat.
+        </p>
+
+        <form class="admin-form" data-admin-login>
+          <label class="admin-form__field">
+            <span>Username</span>
+            <input type="text" name="username" placeholder="Masukkan username admin" autocomplete="username" required />
+          </label>
+          <label class="admin-form__field">
+            <span>Password</span>
+            <input type="password" name="password" placeholder="Masukkan password" autocomplete="current-password" required />
+          </label>
+          <button class="button button--solid pressable" type="submit">Masuk Admin</button>
+          <p class="admin-form__error" data-admin-error hidden></p>
+        </form>
+
+        <div class="detail-actions">
+          <a class="button button--ghost pressable" href="../index.html">Kembali ke website</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
